@@ -136,8 +136,11 @@ function refresh() {
   byId("totKg").textContent = kg + " كيلو من " + min;
   byId("totPrice").textContent = kg ? (totalPrice() + CONFIG.deliveryFee) + " درهم (مع التوصيل)" : "";
   byId("meterBar").style.width = Math.min(100, kg / min * 100) + "%";
-  byId("popSend").disabled = kg < min;
-  byId("sendTxt").textContent = kg >= min ? "صيفط الطلب فالواتساب" : "باقي " + (min - kg) + " كيلو";
+  var hasName = byId("p-name").value.trim() !== "";
+  var hasZone = byId("p-zone").value.trim() !== "";
+  byId("popSend").disabled = !(kg >= min && hasName && hasZone);
+  byId("sendTxt").textContent = kg < min ? "باقي " + (min - kg) + " كيلو" :
+    (!hasName || !hasZone) ? "كتب السمية والحي" : "صيفط الطلب فالواتساب";
 }
 
 function build() {
@@ -180,7 +183,7 @@ function build() {
 }
 
 build();
-["p-name","p-zone"].forEach(function(id){byId(id).addEventListener("input",function(){byId(id).classList.remove("bad");});});
+["p-name","p-zone"].forEach(function(id){byId(id).addEventListener("input",function(){byId(id).classList.remove("bad"); refresh();});});
 byId("popSend").addEventListener("click", function () {
   var name = byId("p-name"), zone = byId("p-zone");
   name.classList.toggle("bad", !name.value.trim());
